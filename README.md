@@ -5,6 +5,8 @@ Repository for Udacity Self-Driving Car Nanodegree Term 3
 
 Path planning project...
 
+Due: 8/7/2017
+
 ## P2 - TBD
 
 TBD...
