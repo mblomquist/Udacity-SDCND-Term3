@@ -1,24 +1,16 @@
 # Udacity-SDCND-Term3
 Repository for Udacity Self-Driving Car Nanodegree Term 3
 
-## P1 - PP
+## P1
 
-Path planning project...
+Path planning project.
 
 Due: 8/7/2017
 
-## P2 - TBD
+## P2
 
-TBD...
+Advanced Deep Learning
 
-## P3 - TBD
+## P3
 
-TBD...
-
-## P4 - TBD
-
-TBD...
-
-## P5 - TBD
-
-TBD... 
+System Integration
