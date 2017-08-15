@@ -240,6 +240,8 @@ int main() {
 
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
+            //
+            // This is where everything goes:
             double pos_x;
             double pos_y;
             double angle;
@@ -276,6 +278,7 @@ int main() {
                 pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
             };
 
+            // This is where everything loads into simulator:
             msgJson["next_x"] = next_x_vals;
             msgJson["next_y"] = next_y_vals;
 
