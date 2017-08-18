@@ -1,5 +1,3 @@
-Project Due Aug 7.
-
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
    
@@ -89,4 +87,4 @@ A really helpful resource for doing this project and creating smooth trajectorie
 
 # Write Up
 
-Add info here...
+See write up sub-directory.
