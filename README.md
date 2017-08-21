@@ -13,8 +13,6 @@ Directory for Lesson 5 example problems.
 
 Path planning project.
 
-Due: 8/7/2017
-
 ## P2
 
 Advanced Deep Learning
