@@ -269,13 +269,16 @@ int main() {
                 angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
             };
 
-            double dist_inc = 0.5;
+            //double dist_inc = 10;
             for(int i = 0; i < 50-path_size; i++)
             {
-                next_x_vals.push_back(pos_x+(dist_inc)*cos(angle+(i+1)*(pi()/100)));
-                next_y_vals.push_back(pos_y+(dist_inc)*sin(angle+(i+1)*(pi()/100)));
-                pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
-                pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
+                int new_waypoint = NextWaypoint(pos_x,pos_y,angle,map_waypoints_x,map_waypoints_y);
+                next_x_vals.push_back(map_waypoints_x[new_waypoint]);
+                next_y_vals.push_back(map_waypoints_y[new_waypoint]);
+                //pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
+                //pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
+                pos_x = map_waypoints_x[new_waypoint];
+                pos_y = map_waypoints_y[new_waypoint];
             };
 
             // Output sensor_fusion data for inspection
@@ -287,7 +290,7 @@ int main() {
               cout << "next car" << endl;
             };
 
-            cout << "car_s:" << car_s << " car_d: " << car_d << endl; 
+            cout << "car_s:" << car_s << " car_d: " << car_d << endl;
             cout << endl << "Next Set" << endl;
 
             // This is where everything loads into simulator:
