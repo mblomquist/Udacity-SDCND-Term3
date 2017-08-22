@@ -278,6 +278,18 @@ int main() {
                 pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
             };
 
+            // Output sensor_fusion data for inspection
+            int sensor_fusion_size = sensor_fusion.size();
+
+            for(int i = 0; i < sensor_fusion_size; i++)
+            {
+              cout << sensor_fusion[i] << endl;
+              cout << "next car" << endl;
+            };
+
+            cout << "car_s:" << car_s << " car_d: " << car_d << endl; 
+            cout << endl << "Next Set" << endl;
+
             // This is where everything loads into simulator:
             msgJson["next_x"] = next_x_vals;
             msgJson["next_y"] = next_y_vals;
