@@ -8,6 +8,7 @@
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "json.hpp"
+#include "spline.h"
 
 using namespace std;
 
@@ -226,6 +227,7 @@ int main() {
           	// Previous path data given to the Planner
           	auto previous_path_x = j[1]["previous_path_x"];
           	auto previous_path_y = j[1]["previous_path_y"];
+
           	// Previous path's end s and d values
           	double end_path_s = j[1]["end_path_s"];
           	double end_path_d = j[1]["end_path_d"];
@@ -233,37 +235,150 @@ int main() {
           	// Sensor Fusion Data, a list of all other cars on the same side of the road.
           	auto sensor_fusion = j[1]["sensor_fusion"];
 
-          	json msgJson;
-
-          	vector<double> next_x_vals;
-          	vector<double> next_y_vals;
-
+            json msgJson;
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
             //
             // This is where everything goes:
 
-            double dist_inc = 0.4;
-            for(int i = 0; i < 50; i++)
+            // Set ref for previous path length
+            int prev_size = previous_path_x.size();
+
+            // Define Starting lane
+            int lane = 1;
+
+            // Define reference velocity
+            double ref_vel = 49.5;
+
+            // Create vector for xy points
+            vector<double> ptsx;
+            vector<double> ptsy;
+
+            // Create reference states
+            double ref_x = car_x;
+            double ref_y = car_y;
+            double ref_yaw = deg2rad(car_yaw);
+
+            // Check if previous state is empty
+            if(prev_size < 2)
             {
-              double next_s = car_s+(i+1)*dist_inc;
-              double next_d = car_d;
-              vector<double> new_xy = getXY(next_s,next_d,map_waypoints_s,map_waypoints_x,map_waypoints_y);
-              next_x_vals.push_back(new_xy[0]);
-              next_y_vals.push_back(new_xy[1]);
-            };
+              // Create previous path of the car
+              double prev_car_x = car_x - cos(car_yaw);
+              double prev_car_y = car_y - sin(car_yaw);
+
+              // Create tangent heading for the car in x
+              ptsx.push_back(prev_car_x);
+              ptsx.push_back(car_x);
+
+              // Create tangent heading for the car in y
+              ptsy.push_back(prev_car_y);
+              ptsy.push_back(car_y);
+            }
+            else
+            {
+              ref_x = previous_path_x[prev_size-1];
+              ref_y = previous_path_y[prev_size-1];
+
+              double ref_x_prev = previous_path_x[prev_size-2];
+              double ref_y_prev = previous_path_y[prev_size-2];
+
+              ref_yaw = atan2(ref_y-ref_y_prev,ref_x-ref_x_prev);
+
+              // Create tangent heading for the car in x
+              ptsx.push_back(ref_x_prev);
+              ptsx.push_back(ref_x);
+
+              // Create tangent heading for the car in y
+              ptsy.push_back(ref_y_prev);
+              ptsy.push_back(ref_y);
+
+            }
+
+            // Create a set of waypoints out 30, 60, and 90m.
+            vector<double> next_wp1 = getXY(car_s+30.0,(2+4*lane),map_waypoints_s,map_waypoints_x,map_waypoints_y);
+            vector<double> next_wp2 = getXY(car_s+60.0,(2+4*lane),map_waypoints_s,map_waypoints_x,map_waypoints_y);
+            vector<double> next_wp3 = getXY(car_s+90.0,(2+4*lane),map_waypoints_s,map_waypoints_x,map_waypoints_y);
+
+            // Push waypoints to ptsx and ptsy
+            ptsx.push_back(next_wp1[0]);
+            ptsx.push_back(next_wp2[0]);
+            ptsx.push_back(next_wp3[0]);
+
+            ptsy.push_back(next_wp1[1]);
+            ptsy.push_back(next_wp2[1]);
+            ptsy.push_back(next_wp3[1]);
+
+            // Transform reference angle to origin
+            for (int i = 0; i < ptsx.size(); i++)
+            {
+
+              double shift_x = ptsx[i]-ref_x;
+              double shift_y = ptsy[i]-ref_y;
+
+              ptsx[i] = (shift_x*cos(0-ref_yaw)-shift_y*sin(0-ref_yaw));
+              ptsy[i] = (shift_x*sin(0-ref_yaw)+shift_y*cos(0-ref_yaw));
+            }
+
+            // Initialize a spline
+            tk::spline s;
+
+            // Set points for the spline to interpolate
+            s.set_points(ptsx,ptsy);
+
+            // Create vector for next_x_vals and next_y_vals
+            vector<double> next_x_vals;
+            vector<double> next_y_vals;
+
+            // Pull previous path points
+            for (int i = 0; i < previous_path_x.size(); i++)
+            {
+              next_x_vals.push_back(previous_path_x[i]);
+              next_y_vals.push_back(previous_path_y[i]);
+            }
+
+            // Create spline target parameters
+            double target_x = 30.0;
+            double target_y = s(target_x);
+            double target_dist = sqrt((target_x)*(target_x)+(target_y)*(target_y));
+
+            double x_add_on = 0;
+
+            // Fill next_x_vals and next_y_vals
+            for (int i = 1; i <= 50-previous_path_x.size(); i++)
+            {
+              double N = (target_dist/(0.02*ref_vel/2.24));
+              double x_point = x_add_on+(target_x)/N;
+              double y_point = s(x_point);
+
+              x_add_on = x_point;
+
+              double x_ref = x_point;
+              double y_ref = y_point;
+
+              // Transform back to map frame
+              x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw));
+              y_point = (x_ref*sin(ref_yaw)+y_ref*cos(ref_yaw));
+
+              // Adjust reference point
+              x_point += ref_x;
+              y_point += ref_y;
+
+              // Push values to next_x_vals and next_y_vals
+              next_x_vals.push_back(x_point);
+              next_y_vals.push_back(y_point);
+            }
 
             // Output sensor_fusion data for inspection
-            int sensor_fusion_size = sensor_fusion.size();
+            // int sensor_fusion_size = sensor_fusion.size();
 
-            for(int i = 0; i < sensor_fusion_size; i++)
-            {
-              cout << sensor_fusion[i] << endl;
-              cout << "next car" << endl;
-            };
+            //for(int i = 0; i < sensor_fusion_size; i++)
+            //{
+            //  cout << sensor_fusion[i] << endl;
+            //  cout << "next car" << endl;
+            //}
 
-            cout << "car_s:" << car_s << " car_d: " << car_d << endl;
-            cout << endl << "Next Set" << endl;
+            //cout << "car_s:" << car_s << " car_d: " << car_d << endl;
+            //cout << endl << "Next Set" << endl;
 
             // This is where everything loads into simulator:
             msgJson["next_x"] = next_x_vals;

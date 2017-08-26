@@ -849,4 +849,16 @@ Eigen-3.3/Eigen/QR
 /home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P1/src/Eigen-3.3/Eigen/QR
 json.hpp
 /home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P1/src/json.hpp
+spline.h
+/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P1/src/spline.h
+
+/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P1/src/spline.h
+cstdio
+-
+cassert
+-
+vector
+-
+algorithm
+-
 
