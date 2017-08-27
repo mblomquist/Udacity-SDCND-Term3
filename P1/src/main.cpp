@@ -261,6 +261,9 @@ int main() {
             bool clear_l = true;
             bool clear_r = true;
 
+            double dist_to_l = 0;
+            double dist_to_r = 0;
+
             // Prediction - Check for traffic in current lane
             for (int i = 0; i < sensor_fusion.size(); i++)
             {
@@ -311,7 +314,7 @@ int main() {
 
                   if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 15.0)
                   {
-                    clear_r = false;
+                    clear_l = false;
                   }
                 }
               }
