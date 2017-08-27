@@ -102,22 +102,64 @@ The path planner source code is located in the src/main.cpp file. The main funct
 
 ### Prediction
 
-The prediction module pulls in sensor fusion data from the Udacity simulator and checks the location of other vehicles on the road. If vehicles are identified in a proximity of < 30.0 metere, the primary vehicle will take one of the following finite actions:
+The prediction module pulls in sensor fusion data from the Udacity simulator and checks the location of other vehicles on the road. The threshold value for this check is set to 25.0 meters. If a car is found in the current lane, an estimate of the car's location is made based on a simple dynamic model. The current speed of the car is estimated for the size of the previous path length. This estimates where the car will be in the future at the location of path completion.
+
+```
+// Prediction - Check for traffic in current lane
+for (int i = 0; i < sensor_fusion.size(); i++)
+{
+  float d = sensor_fusion[i][6];
+
+  if (d < (2+4*lane+2) && d > (2+4*lane-2))
+  {
+    double vx = sensor_fusion[i][3];
+    double vy = sensor_fusion[i][4];
+    double check_speed = sqrt(vx*vx+vy*vy);
+    double check_car_s = sensor_fusion[i][5];
+
+    check_car_s += ((double)prev_size*0.02*check_speed);
+
+    if((check_car_s > car_s) && ((check_car_s-car_s) < 25.0))
+    {
+      too_close = true;
+    }
+  }
+}
+```
+If another car meets the criteria for being too close, a boolean value is flagged.
+
+### Planning
+
+The planning module takes the information provided from the prediction module and feeds that into a decision tree. The decision tree will decide which action (listed above) to take. This is done by flagging boolean values in the prediction module and feeding those values through the decision tree. If vehicles are identified in a proximity of < 25.0 meters, the primary vehicle will take one of the following finite actions:
 - Stay in lane and slow down
 - Change lanes to the right
 - Change lanes to the left
 
-If no vehicles are identified in the primary vehicles path, the vehicle will accelerate at a rate no to exceed the limits of the project rubric. This is done to maintain passenger comfort. The conditional test used to determine if vehicles were present is shown below:
-
+If another vehicle is within 25.0 meters, the left lane is checked for other vehicles provided the primary vehicle is not in the left-most lane. Then the planner will check the right lane provided the vehicle is not in the right-most lane. If another vehicle is found, a false statement is flagged meaning that the lane is not clear to travel into. This is all done within a condition for the boolean flag created by the prediction module.
 ```
-(d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 15.0)
+// Planner - Make descition if traffic is in current lane
+if(too_close)
+{
+
+  // Check left lane
+  if (lane > 0)
+  {
+    for (int i = 0; i < sensor_fusion.size(); i++)
+    {
+      float s = sensor_fusion[i][5];
+      float d = sensor_fusion[i][6];
+
+      if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 15.0)
+      {
+        clear_l = false;
+      }
+    }
+  }
 ```
 
-### Planning
+Lane checking is accomplished by meeting the criteria for being in the lane (to the left in the code above) and being within +/- 15.0 meters from the current car. This is a crude assessment and can be further improved by taking into consideration the future states of the vehicles in other lanes. This method tends to work in most cases though and is computationally simple.
 
-The planning module takes the information provided from the prediction module and feeds that into a decision tree. The decision tree will decide which action (listed above) to take. This is done by flagging boolean values in the prediction module and feeding those values through the decision tree. If another vehicle is within 30.0 meters, the left lane is checked for other vehicles provided the primary vehicle is not in the left-most lane. Then the planner will check the right lane provided the vehicle is not in the right-most lane. If another vehicle is found, a false statement is flagged meaning that the lane is not clear to travel into. Finally, the boolean values are passed through a conditional tree with priority for moving to the right lane.
-
-The code below shows the decision tree:
+Finally, the boolean values are passed through a conditional tree with priority for moving to the right lane.
 ```
 // Make a decision of where to go
 if (clear_r)
@@ -133,7 +175,8 @@ else
   ref_vel -= 0.385;
 }
 ```
-If both left and right turn options are in adequate, the vehicle's velocity is reduced.
+
+If both the right lane and left lane are not clear, the vehicles velocity will be reduced. If no vehicles are identified in the primary vehicles path, the vehicle will accelerate at a rate no to exceed the limits of the project rubric. This is done to maintain passenger comfort. The conditional test used to determine if vehicles were present is shown below:
 
 ### Trajectory Generation
 
@@ -156,4 +199,4 @@ By changing the threshold for checking the left and right lanes to 15.0 meters, 
 
 ## Additional Work
 
-After reviewing the project code, I think additional work can be spent on the planning module. The simplistic decision tree works for this particular project, but would need to be enhanced for implementation in a real world senario.
+After reviewing the project code, I think additional work can be spent on the planning module. The simplistic decision tree works for this particular project, but would need to be enhanced for implementation in a real world senario. Additionally, the future state of cars in other lanes could be incorporated into the planner to get a better assessment of road condition in the future.
