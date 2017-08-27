@@ -113,12 +113,36 @@ If no vehicles are identified in the primary vehicles path, the vehicle will acc
 
 The planning module takes the information provided from the prediction module and feeds that into a decision tree. The decision tree will decide which action (listed above) to take. This is done by flagging boolean values in the prediction module and feeding those values through the decision tree. If another vehicle is within 30.0 meters, the left lane is checked for other vehicles provided the primary vehicle is not in the left-most lane. Then the planner will check the right lane provided the vehicle is not in the right-most lane. If another vehicle is found, a false statement is flagged meaning that the lane is not clear to travel into. Finally, the boolean values are passed through a conditional tree with priority for moving to the right lane.
 
+The code below shows the decision tree:
+```
+// Make a decision of where to go
+if (clear_r)
+{
+  lane = lane+1;
+}
+else if (clear_l)
+{
+  lane = lane-1;
+}
+else
+{
+  ref_vel -= 0.385;
+}
+```
+If both left and right turn options are in adequate, the vehicle's velocity is reduced.
+
 ### Trajectory Generation
 
 The trajectory generation module takes the lane information from the planning module and creates a set of waypoints for the vehicle to move too. To smooth the trajectory, the last two values from the previous path and three new waypoints set at 30m, 60m, and 90m are placed into vectors. Those waypoints are then fed into a spline generation tool.
 
 ## Results
 
+During test, the planner performed adequately well with respect to the project rubric. Initial cases were able to pass the 4.32 mile mark with no incidents. However, during subsequent tests it was seen that erratic behavior from other cars on the road tended to yield collisions.
+
+![test_435](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_4_35.JPG)
+![test_510](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_5_10.JPG)
+![test_705](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_7_05.JPG)
+![test_761](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_7_61.JPG)
 
 ## Additional Work
 
