@@ -257,6 +257,8 @@ int main() {
             }
 
             bool too_close = false;
+            bool clear_l = true;
+            bool clear_r = true;
 
             // Find rev_vel to use
             for (int i = 0; i < sensor_fusion.size(); i++)
@@ -272,7 +274,7 @@ int main() {
 
                 check_car_s += ((double)prev_size*0.02*check_speed);
 
-                if((check_car_s > car_s) && ((check_car_s-car_s)< 15.0))
+                if((check_car_s > car_s) && ((check_car_s-car_s) < 30.0))
                 {
                   too_close = true;
                 }
@@ -281,7 +283,60 @@ int main() {
 
             if(too_close)
             {
-              ref_vel -= 0.385;
+
+              // Check left lane
+              if (lane > 0)
+              {
+                for (int i = 0; i < sensor_fusion.size(); i++)
+                {
+                  float s = sensor_fusion[i][5];
+                  float d = sensor_fusion[i][6];
+
+                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 30.0)
+                  {
+                    clear_l = false;
+                  }
+                }
+              }
+
+              // Check right lane
+              if (lane < 2)
+              {
+                for (int i = 0; i < sensor_fusion.size(); i++)
+                {
+                  float s = sensor_fusion[i][5];
+                  float d = sensor_fusion[i][6];
+
+                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 30.0)
+                  {
+                    clear_r = false;
+                  }
+                }
+              }
+
+              if (lane == 0)
+              {
+                clear_l = false;
+              }
+              if (lane == 2)
+              {
+                clear_r = false;
+              }
+
+              // Where to go
+              if (clear_r)
+              {
+                lane = lane+1;
+              }
+              else if (clear_l)
+              {
+                lane = lane-1;
+              }
+              else
+              {
+                ref_vel -= 0.385;
+              }
+
             }
             else if(ref_vel < 49.5)
             {
@@ -419,6 +474,8 @@ int main() {
 
             //cout << "car_s:" << car_s << " car_d: " << car_d << endl;
             //cout << endl << "Next Set" << endl;
+
+            cout << "Lane: " << lane << endl;
 
             // This is where everything loads into simulator:
             msgJson["next_x"] = next_x_vals;
