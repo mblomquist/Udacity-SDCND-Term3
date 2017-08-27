@@ -275,7 +275,7 @@ int main() {
 
                 check_car_s += ((double)prev_size*0.02*check_speed);
 
-                if((check_car_s > car_s) && ((check_car_s-car_s) < 30.0))
+                if((check_car_s > car_s) && ((check_car_s-car_s) < 25.0))
                 {
                   too_close = true;
                 }
@@ -294,7 +294,7 @@ int main() {
                   float s = sensor_fusion[i][5];
                   float d = sensor_fusion[i][6];
 
-                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 10.0)
+                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 15.0)
                   {
                     clear_l = false;
                   }
@@ -309,7 +309,7 @@ int main() {
                   float s = sensor_fusion[i][5];
                   float d = sensor_fusion[i][6];
 
-                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 10.0)
+                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 15.0)
                   {
                     clear_r = false;
                   }
