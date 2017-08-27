@@ -250,17 +250,18 @@ int main() {
             // Set ref for previous path length
             int prev_size = previous_path_x.size();
 
-            // Sensor Fusion Module
+            // Check if a previous path has been used
             if (prev_size > 0)
             {
               car_s = end_path_s;
             }
 
+            // Assign values for decision making
             bool too_close = false;
             bool clear_l = true;
             bool clear_r = true;
 
-            // Find rev_vel to use
+            // Prediction - Check for traffic in current lane
             for (int i = 0; i < sensor_fusion.size(); i++)
             {
               float d = sensor_fusion[i][6];
@@ -281,6 +282,7 @@ int main() {
               }
             }
 
+            // Planner - Make descition if traffic is in current lane
             if(too_close)
             {
 
@@ -292,7 +294,7 @@ int main() {
                   float s = sensor_fusion[i][5];
                   float d = sensor_fusion[i][6];
 
-                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 30.0)
+                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 10.0)
                   {
                     clear_l = false;
                   }
@@ -307,13 +309,14 @@ int main() {
                   float s = sensor_fusion[i][5];
                   float d = sensor_fusion[i][6];
 
-                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 30.0)
+                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 10.0)
                   {
                     clear_r = false;
                   }
                 }
               }
 
+              // Set values to stay on the correct side of traffic
               if (lane == 0)
               {
                 clear_l = false;
@@ -323,7 +326,7 @@ int main() {
                 clear_r = false;
               }
 
-              // Where to go
+              // Make a decision of where to go
               if (clear_r)
               {
                 lane = lane+1;
@@ -338,14 +341,12 @@ int main() {
               }
 
             }
-            else if(ref_vel < 49.5)
+            else if(ref_vel < 49.5) // Speed up if lane is free
             {
               ref_vel += 0.385;
             }
 
-            // End Sensor Fusion
-
-            // Create vector for xy points
+            // Create vector for xy points for spline
             vector<double> ptsx;
             vector<double> ptsy;
 
@@ -371,12 +372,15 @@ int main() {
             }
             else
             {
+              // If previous state is not empty, pull in previous data
               ref_x = previous_path_x[prev_size-1];
               ref_y = previous_path_y[prev_size-1];
 
+              // Assign place holder variables for previous data
               double ref_x_prev = previous_path_x[prev_size-2];
               double ref_y_prev = previous_path_y[prev_size-2];
 
+              // Calculate previous heading
               ref_yaw = atan2(ref_y-ref_y_prev,ref_x-ref_x_prev);
 
               // Create tangent heading for the car in x
@@ -438,9 +442,10 @@ int main() {
 
             double x_add_on = 0;
 
-            // Fill next_x_vals and next_y_vals
+            // Fill next_x_vals and next_y_vals with smooth data
             for (int i = 1; i <= 50-previous_path_x.size(); i++)
             {
+              // Linearize target data
               double N = (target_dist/(0.02*ref_vel/2.24));
               double x_point = x_add_on+(target_x)/N;
               double y_point = s(x_point);
@@ -454,7 +459,7 @@ int main() {
               x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw));
               y_point = (x_ref*sin(ref_yaw)+y_ref*cos(ref_yaw));
 
-              // Adjust reference point
+              // Shift to previous x and y values
               x_point += ref_x;
               y_point += ref_y;
 
@@ -462,20 +467,6 @@ int main() {
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
             }
-
-            // Output sensor_fusion data for inspection
-            // int sensor_fusion_size = sensor_fusion.size();
-
-            //for(int i = 0; i < sensor_fusion_size; i++)
-            //{
-            //  cout << sensor_fusion[i] << endl;
-            //  cout << "next car" << endl;
-            //}
-
-            //cout << "car_s:" << car_s << " car_d: " << car_d << endl;
-            //cout << endl << "Next Set" << endl;
-
-            cout << "Lane: " << lane << endl;
 
             // This is where everything loads into simulator:
             msgJson["next_x"] = next_x_vals;

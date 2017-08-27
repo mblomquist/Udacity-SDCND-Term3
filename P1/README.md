@@ -1,6 +1,8 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
+
+## Project Description and Setup
+
 ### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
 
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
@@ -36,13 +38,13 @@ Here is the data provided from the Simulator to the C++ Program
 #### Previous path data given to the Planner
 
 //Note: Return the previous list but with processed points removed, can be a nice tool to show how far along
-the path has processed since last time. 
+the path has processed since last time.
 
 ["previous_path_x"] The previous list of x points previously given to the simulator
 
 ["previous_path_y"] The previous list of y points previously given to the simulator
 
-#### Previous path's end s and d values 
+#### Previous path's end s and d values
 
 ["end_path_s"] The previous list's last point's frenet s value
 
@@ -50,7 +52,7 @@ the path has processed since last time.
 
 #### Sensor Fusion Data, a list of all other car's attributes on the same side of the road. (No Noise)
 
-["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates. 
+["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates.
 
 ## Details
 
@@ -80,11 +82,44 @@ A really helpful resource for doing this project and creating smooth trajectorie
   * Run either `install-mac.sh` or `install-ubuntu.sh`.
   * If you install from source, checkout to commit `e94b6e1`, i.e.
     ```
-    git clone https://github.com/uWebSockets/uWebSockets 
+    git clone https://github.com/uWebSockets/uWebSockets
     cd uWebSockets
     git checkout e94b6e1
     ```
 
 # Write Up
 
-See write up sub-directory.
+## Overview
+
+This project is a path planner that can be used with the Udacity simulator to autonomously drive a vehicle on a road with traffic. The vehicle follows map coordinates and will switch lanes in such a way that is maintains a speed near the limit of the highway.
+
+## Modules
+
+The path planner source code is located in the src/main.cpp file. The main function of the planner is broken into three distinct parts.
+- Prediction
+- Planning
+- Trajectory Generation
+
+### Prediction
+
+The prediction module pulls in sensor fusion data from the Udacity simulator and checks the location of other vehicles on the road. If vehicles are identified in a proximity of < 30.0 metere, the primary vehicle will take one of the following finite actions:
+- Stay in lane and slow down
+- Change lanes to the right
+- Change lanes to the left
+
+If no vehicles are identified in the primary vehicles path, the vehicle will accelerate at a rate no to exceed the limits of the project rubric. This is done to maintain passenger comfort.
+
+### Planning
+
+The planning module takes the information provided from the prediction module and feeds that into a decision tree. The decision tree will decide which action (listed above) to take. This is done by flagging boolean values in the prediction module and feeding those values through the decision tree. If another vehicle is within 30.0 meters, the left lane is checked for other vehicles provided the primary vehicle is not in the left-most lane. Then the planner will check the right lane provided the vehicle is not in the right-most lane. If another vehicle is found, a false statement is flagged meaning that the lane is not clear to travel into. Finally, the boolean values are passed through a conditional tree with priority for moving to the right lane.
+
+### Trajectory Generation
+
+The trajectory generation module takes the lane information from the planning module and creates a set of waypoints for the vehicle to move too. To smooth the trajectory, the last two values from the previous path and three new waypoints set at 30m, 60m, and 90m are placed into vectors. Those waypoints are then fed into a spline generation tool.
+
+## Results
+
+
+## Additional Work
+
+After reviewing the project code, I think additional work can be spent on the planning module. The simplistic decision tree works for this particular project, but would need to be enhanced for implementation in a real world senario.
