@@ -107,7 +107,11 @@ The prediction module pulls in sensor fusion data from the Udacity simulator and
 - Change lanes to the right
 - Change lanes to the left
 
-If no vehicles are identified in the primary vehicles path, the vehicle will accelerate at a rate no to exceed the limits of the project rubric. This is done to maintain passenger comfort.
+If no vehicles are identified in the primary vehicles path, the vehicle will accelerate at a rate no to exceed the limits of the project rubric. This is done to maintain passenger comfort. The conditional test used to determine if vehicles were present is shown below:
+
+```
+(d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 15.0)
+```
 
 ### Planning
 
@@ -140,7 +144,13 @@ The trajectory generation module takes the lane information from the planning mo
 During test, the planner performed adequately well with respect to the project rubric. Initial cases were able to pass the 4.32 mile mark with no incidents. However, during subsequent tests it was seen that erratic behavior from other cars on the road tended to yield collisions.
 
 ![test_435](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_4_35.JPG)
+
+The performance of the model was improved by adjusting the threshold values used in the conditional statements. For example, a 25.0 meter threshold was used to determine if action needed to be taken given a car in the lane ahead.
+
 ![test_510](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_5_10.JPG)
+
+By changing the threshold for checking the left and right lanes to 15.0 meters, quicker manuvers were able to be taken and improve the average speed. In the best case, a range of 7.61 miles was achieved. 
+
 ![test_705](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_7_05.JPG)
 ![test_761](https://github.com/mblomquist/Udacity-SDCND-Term3/blob/master/P1/pictures/test_7_61.JPG)
 
