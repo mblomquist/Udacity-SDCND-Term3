@@ -297,7 +297,7 @@ int main() {
                   float s = sensor_fusion[i][5];
                   float d = sensor_fusion[i][6];
 
-                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 15.0)
+                  if (d < (-2+4*lane+2) && d > (-2+4*lane-2) && fabs(s-car_s) < 20.0)
                   {
                     clear_l = false;
                   }
@@ -312,9 +312,9 @@ int main() {
                   float s = sensor_fusion[i][5];
                   float d = sensor_fusion[i][6];
 
-                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 15.0)
+                  if (d < (6+4*lane+2) && d > (6+4*lane-2) && fabs(s-car_s) < 20.0)
                   {
-                    clear_l = false;
+                    clear_r = false;
                   }
                 }
               }
