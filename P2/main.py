@@ -56,7 +56,31 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    return None
+    
+    layer3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='SAME', 
+                              kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+    
+    layer4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='SAME', 
+                              kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+    
+    layer7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='SAME', 
+                              kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+    
+    layer7_transpose = tf.layers.conv2d_transpose(layer7, num_classes, 4, strides=(2,2), padding='SAME',
+                                                  kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+    
+    skip_layer4 = tf.add(layer4, layer7_transpose)
+    
+    layer4_transpose = tf.layers.conv2d_transpose(skip_layer4, num_classes, 4, strides=(2,2), padding='SAME',
+                                                  kernal_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+    
+    skip_layer3 = tf.add(layer3, layer4_transpose)
+    
+    layer3_transpose = tf.layers.conv2d_transpose(skip_layer3, num_classes, 4, strides=(2,2), padding='SAME',
+                                                  kernal_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+    
+    return layer3_transpose
+
 tests.test_layers(layers)
 
 
