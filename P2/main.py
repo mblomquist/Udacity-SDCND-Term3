@@ -124,7 +124,32 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param learning_rate: TF Placeholder for learning rate
     """
     # TODO: Implement function
+    saver = tf.train.Saver()
+    train_writer = tf.summary.FileWriter('./logs', sess.graph)
+    
+    for i in range(epochs):
+        
+        for j, k in get_batches_fn(batch_size):
+            
+            merge = tf.summary.merge_all()
+            
+            summary, _, loss = sess.run([merge, train_op, cross_entropy_loss],
+                                        feed_dict = {input_image: j, correct_label: k,
+                                                    keep_prob: .7, learning_rate = 1e-4})
+            
+            train_writer.add_summary(summary, index)
+            
+            if index % 10 == 0:
+                print("Epoch: ", i)
+                print("Loss {:.5f}...".format(loss))
+                
+            index += 1
+            
+        saver.save(sess, "checkpoints/a.ckpt")
+        print("Checkpoints Saved.")
+        
     pass
+
 tests.test_train_nn(train_nn)
 
 
