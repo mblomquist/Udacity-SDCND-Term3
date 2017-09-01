@@ -30,3 +30,5 @@ python main.py
  - `main.py`
  - `project_tests.py`
  - Newest inference images from `runs` folder
+
+Note: Check walkthrough video.
