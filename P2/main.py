@@ -32,15 +32,15 @@ def load_vgg(sess, vgg_path):
     vgg_layer3_out_tensor_name = 'layer3_out:0'
     vgg_layer4_out_tensor_name = 'layer4_out:0'
     vgg_layer7_out_tensor_name = 'layer7_out:0'
-    
+
     tf.saved_model.loader.load(sess, [vgg_tag], vgg_path)
-    
+
     image_input = tf.get_default_graph().get_tensor_by_name(vgg_input_tensor_name)
     keep_prob = tf.get_default_graph().get_tensor_by_name(vgg_keep_prob_tensor_name)
     layer3_out = tf.get_default_graph().get_tensor_by_name(vgg_layer3_out_tensor_name)
     layer4_out = tf.get_default_graph().get_tensor_by_name(vgg_layer4_out_tensor_name)
     layer7_out = tf.get_default_graph().get_tensor_by_name(vgg_layer7_out_tensor_name)
-    
+
     return image_input, keep_prob, layer3_out, layer4_out, layer7_out
 
 tests.test_load_vgg(load_vgg, tf)
@@ -56,29 +56,29 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    
-    layer3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='SAME', 
+
+    layer3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='SAME',
                               kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
-    
-    layer4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='SAME', 
+
+    layer4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='SAME',
                               kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
-    
-    layer7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='SAME', 
+
+    layer7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='SAME',
                               kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
-    
+
     layer7_transpose = tf.layers.conv2d_transpose(layer7, num_classes, 4, strides=(2,2), padding='SAME',
                                                   kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
-    
+
     skip_layer4 = tf.add(layer4, layer7_transpose)
-    
+
     layer4_transpose = tf.layers.conv2d_transpose(skip_layer4, num_classes, 4, strides=(2,2), padding='SAME',
-                                                  kernal_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
-    
+                                                  kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+
     skip_layer3 = tf.add(layer3, layer4_transpose)
-    
+
     layer3_transpose = tf.layers.conv2d_transpose(skip_layer3, num_classes, 4, strides=(2,2), padding='SAME',
-                                                  kernal_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
-    
+                                                  kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
+
     return layer3_transpose
 
 tests.test_layers(layers)
@@ -94,15 +94,15 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
     # TODO: Implement function
-    
+
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     labels = tf.reshape(correct_label, (-1, num_classes))
-    
+
     entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
     cross_entropy_loss = tf.reduce_mean(entropy)
-    
+
     train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
-    
+
     return logits, train_op, cross_entropy_loss
 
 tests.test_optimize(optimize)
@@ -126,34 +126,34 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     # TODO: Implement function
     saver = tf.train.Saver()
     train_writer = tf.summary.FileWriter('./logs', sess.graph)
-    
+
     for i in range(epochs):
-        
+
         for j, k in get_batches_fn(batch_size):
-            
+
             merge = tf.summary.merge_all()
-            
+
             summary, _, loss = sess.run([merge, train_op, cross_entropy_loss],
                                         feed_dict = {input_image: j, correct_label: k,
-                                                    keep_prob: .7, learning_rate = 1e-4})
-            
+                                                    keep_prob: .7, learning_rate: 1e-4})
+
             train_writer.add_summary(summary, index)
-            
+
             if index % 10 == 0:
                 print("Epoch: ", i)
                 print("Loss {:.5f}...".format(loss))
-                
+
             index += 1
-            
+
         saver.save(sess, "checkpoints/a.ckpt")
         print("Checkpoints Saved.")
-        
+
     pass
 
 tests.test_train_nn(train_nn)
 
 
-def run():
+def run(flag="TRAIN"):
     num_classes = 2
     image_shape = (160, 576)
     data_dir = './data'
@@ -177,11 +177,34 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
+        learning_rate = tf.placeholder(tf.float32)
+
+        correct_labels = tf.placeholder(tf.float32, shape=(None, None, None, num_classes))
+
+        image_input, keep_prob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, = load_vgg(sess, vgg_path)
+
+        encoder = layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
+
+        logits, trainer, loss = optimize(encoder, correct_labels, learning_rate, num_classes)
+
+        sess.run(tf.global_initializer())
+
+        epochs = 10
+        batch_size = 16
 
         # TODO: Train NN using the train_nn function
 
-        # TODO: Save inference data using helper.save_inference_samples
-        #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        if flag == "TRAIN":
+            train_nn(sess, epochs, batch_size, get_batches_fn, trainer, loss, image_input,
+            correct_labels, keep_prob, learning_rate)
+
+    # TODO: Save inference data using helper.save_inference_samples
+    #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+
+    with tf.Session() as sess:
+        saver = tf.train.Saver()
+        saver.restore(sess, tf.train.latest_checkpoint('checkpoints'))
+        helper.save_interface_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
 
         # OPTIONAL: Apply the trained model to a video
 
