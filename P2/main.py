@@ -76,7 +76,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     skip_layer3 = tf.add(layer3, layer4_transpose)
 
-    layer3_transpose = tf.layers.conv2d_transpose(skip_layer3, num_classes, 4, strides=(2,2), padding='SAME',
+    layer3_transpose = tf.layers.conv2d_transpose(skip_layer3, num_classes, 16, strides=(8,8), padding='SAME',
                                                   kernel_initializer=tf.truncated_normal_initializer(stddev = 1e-3))
 
     return layer3_transpose
@@ -124,36 +124,32 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param learning_rate: TF Placeholder for learning rate
     """
     # TODO: Implement function
-    saver = tf.train.Saver()
-    train_writer = tf.summary.FileWriter('./logs', sess.graph)
 
-    for i in range(epochs):
+    with sess.as_default():
 
-        for j, k in get_batches_fn(batch_size):
+        sess.run(tf.global_variables_initializer())
 
-            merge = tf.summary.merge_all()
+        for i in range(epochs):
 
-            summary, _, loss = sess.run([merge, train_op, cross_entropy_loss],
-                                        feed_dict = {input_image: j, correct_label: k,
-                                                    keep_prob: .7, learning_rate: 1e-4})
+            index = 0
 
-            train_writer.add_summary(summary, index)
+            print("Training...")
 
-            if index % 10 == 0:
-                print("Epoch: ", i)
-                print("Loss {:.5f}...".format(loss))
+            for image, label in get_batches_fn(batch_size):
 
-            index += 1
+                index += 1
 
-        saver.save(sess, "checkpoints/a.ckpt")
-        print("Checkpoints Saved.")
+                _, loss = sess.run([train_op, cross_entropy_loss],
+                feed_dict = {input_image: image, correct_label: label, keep_prob: .7, learning_rate: 1e-4})
 
-    pass
+            print("EPOCH {} ...".format(i+1))
+            print("Loss = {:.4f}".format(loss))
+            print()
 
 tests.test_train_nn(train_nn)
 
 
-def run(flag="TRAIN"):
+def run():
     num_classes = 2
     image_shape = (160, 576)
     data_dir = './data'
@@ -187,23 +183,18 @@ def run(flag="TRAIN"):
 
         logits, trainer, loss = optimize(encoder, correct_labels, learning_rate, num_classes)
 
-        sess.run(tf.global_initializer())
+        sess.run(tf.global_variables_initializer())
 
         epochs = 10
-        batch_size = 16
+        batch_size = 3
 
         # TODO: Train NN using the train_nn function
 
-        if flag == "TRAIN":
-            train_nn(sess, epochs, batch_size, get_batches_fn, trainer, loss, image_input,
-            correct_labels, keep_prob, learning_rate)
+        train_nn(sess, epochs, batch_size, get_batches_fn, trainer, loss, image_input,
+        correct_labels, keep_prob, learning_rate)
 
-    # TODO: Save inference data using helper.save_inference_samples
-    #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
-
-    with tf.Session() as sess:
-        saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('checkpoints'))
+        # TODO: Save inference data using helper.save_inference_samples
+        #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper.save_interface_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
 
         # OPTIONAL: Apply the trained model to a video
