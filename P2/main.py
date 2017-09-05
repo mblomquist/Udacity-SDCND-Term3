@@ -129,15 +129,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 
         sess.run(tf.global_variables_initializer())
 
+        print("Training model...")
+        print()
+
         for i in range(epochs):
 
-            index = 0
-
-            print("Training...")
-
             for image, label in get_batches_fn(batch_size):
-
-                index += 1
 
                 _, loss = sess.run([train_op, cross_entropy_loss],
                 feed_dict = {input_image: image, correct_label: label, keep_prob: .7, learning_rate: 1e-4})
@@ -185,7 +182,7 @@ def run():
 
         sess.run(tf.global_variables_initializer())
 
-        epochs = 10
+        epochs = 7
         batch_size = 3
 
         # TODO: Train NN using the train_nn function
@@ -195,7 +192,7 @@ def run():
 
         # TODO: Save inference data using helper.save_inference_samples
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
-        helper.save_interface_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
 
         # OPTIONAL: Apply the trained model to a video
 
