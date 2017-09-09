@@ -1,0 +1,8 @@
+prefix=/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel
+
+Name: twist_controller
+Description: Description of twist_controller
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/lib 
+Requires: 

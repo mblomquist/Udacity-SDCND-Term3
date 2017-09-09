@@ -1,0 +1,2 @@
+set(styx_msgs_MESSAGE_FILES "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/styx_msgs/msg/TrafficLight.msg;/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/styx_msgs/msg/TrafficLightArray.msg;/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/styx_msgs/msg/Waypoint.msg;/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/styx_msgs/msg/Lane.msg")
+set(styx_msgs_SERVICE_FILES "")
