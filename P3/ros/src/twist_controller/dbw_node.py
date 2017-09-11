@@ -57,7 +57,8 @@ class DBWNode(object):
         # self.controller = TwistController(<Arguments you wish to provide>)
 
         # TODO: Subscribe to all the topics you need to
-
+        rospy.Subscriber('/twist_cmd', ???, self.twist_cmd)
+        
         self.loop()
 
     def loop(self):
