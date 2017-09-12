@@ -158,6 +158,11 @@ class TLDetector(object):
         """
             Matt:
             Test using: cv2.projectPoints() function to project the image.
+            
+            Example:
+            cameraMatrix = np.ndarry([fx, 0, image_width/2; 0, fy, image_height/2; 0, 0, 1;])
+            imagePoints = cv2.projectPoints(points_in_world, rot, trans, cameraMatrix)
+            return imagePoints[0] imagePoints[1]
         """
         
         # light = None
