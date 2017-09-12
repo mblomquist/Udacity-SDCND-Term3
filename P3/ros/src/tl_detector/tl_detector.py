@@ -154,7 +154,12 @@ class TLDetector(object):
 
         fx = self.config["camera_info"]["focal_length_x"]
         fy = self.config["camera_info"]["focal_length_y"]
-
+        
+        """
+            Matt:
+            Test using: cv2.projectPoints() function to project the image.
+        """
+        
         # light = None
         # light_positions = self.config['light_positions']
         # if(self.pose):
