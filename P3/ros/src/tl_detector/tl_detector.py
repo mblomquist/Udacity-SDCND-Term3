@@ -161,8 +161,8 @@ class TLDetector(object):
             
             Example:
             cameraMatrix = np.ndarry([fx, 0, image_width/2; 0, fy, image_height/2; 0, 0, 1;])
-            imagePoints = cv2.projectPoints(points_in_world, rot, trans, cameraMatrix)
-            return imagePoints[0] imagePoints[1]
+            [x, y] = cv2.projectPoints(points_in_world, rot, trans, cameraMatrix)
+            return (int(x), int(y))
         """
         
         # light = None
