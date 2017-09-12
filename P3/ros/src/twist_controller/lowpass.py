@@ -2,7 +2,7 @@
 class LowPassFilter(object):
     def __init__(self, tau, ts):
         self.a = 1. / (tau / ts + 1.)
-        self.b = tau / ts / (tau / ts + 1.);
+        self.b = tau / ts / (tau / ts + 1.)
 
         self.last_val = 0.
         self.ready = False
@@ -18,3 +18,16 @@ class LowPassFilter(object):
 
         self.last_val = val
         return val
+
+
+class SmoothingFilter(object):
+
+    def __init__(self, window_weight):
+
+        self.last_value = 0
+        self.window_weight = window_weight
+
+    def get_smoothed_value(self, value):
+
+        self.last_value = (self.window_weight * self.last_value) + ((1.0 - self.window_weight) * value)
+        return self.last_value

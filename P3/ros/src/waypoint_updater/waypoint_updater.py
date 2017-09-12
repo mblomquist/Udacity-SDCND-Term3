@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 
+import math
 import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
+import geometry_msgs.msg
+import std_msgs.msg
+import os
+import shutil
 
-import math
+import waypoints_helper
+import numpy as np
 
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
@@ -21,53 +27,57 @@ as well as to verify your TL classifier.
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
-LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
+LOOKAHEAD_WPS = 50  # Number of waypoints we will publish. You can change this number
+LOOKBEHIND_WPS = 50
+
+LOOK_BEHIND_METRES = 5
+LOOK_AHEAD_METRES = 20
+
+
+miles_per_hour_to_metres_per_second = 0.44704
 
 
 class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
-        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
-        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
-
-        # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-        rospy.Subscriber('/traffic_waypoint', Lane, self.traffic_cb)
-        rospy.Subscriber('/obstacle_waypoint', Lane, self.obstacle_cb)
-        rospy.Subscriber('/current_velocity', geometry_msg.TwistStamped, self.velocity_cb, queue_size=1)
-        
-        rospy.Subscriber('/upcoming_stop_light_position', geometry_msgs.msg.Point, self.traffic_cb, queue_size=1)
-
-        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-
         # TODO: Add other member variables you need below
         self.last_base_waypoints_lane = None
         self.last_base_waypoints_matrix = None
-        
+
         self.upcoming_traffic_light_position = None
         self.upcoming_traffic_light_message_time = None
         self.current_linear_velocity = None
         self.pose = None
-        
-        # Define braking path for a red light
+
+        # Defines braking path for a red light
         self.braking_path_waypoints = None
-        
-        # For debugging purpose only
-        self.last_saved_final_points_start_index = 18
-        
+
+        # For debugging purposes only
+        self.last_saved_final_points_start_index = -10
+
         self.waypoints_dir = "/tmp/waypoints/"
         shutil.rmtree(self.waypoints_dir, ignore_errors=True)
-        
+
         if not os.path.exists(self.waypoints_dir):
             os.makedirs(self.waypoints_dir)
-        
+
         self.previous_debug_time = rospy.get_rostime()
-        
+
+        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
+        rospy.Subscriber('/current_velocity', geometry_msgs.msg.TwistStamped, self.velocity_cb, queue_size=1)
+        rospy.Subscriber('/base_waypoints', Lane, self.base_waypoints_cb, queue_size=1)
+
+        # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
+        rospy.Subscriber('/upcoming_stop_light_position', geometry_msgs.msg.Point, self.traffic_cb, queue_size=1)
+
+        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
+
         self.loop()
 
     def loop(self):
-        
-        # Based on suggestions from:
+
+        # Based on suggestions from
         # https://github.com/amakurin/CarND-Capstone/commit/9809bc60d51c06174f8c8bfe6c40c88ec1c39d50
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
@@ -145,28 +155,31 @@ class WaypointUpdater(object):
                 self.print_car_waypoint(car_waypoint_index)
 
             rate.sleep()
-            
+
     def pose_cb(self, msg):
-        # TODO: Implement
+
         self.pose = msg.pose
 
-    def waypoints_cb(self, waypoints):
+    def base_waypoints_cb(self, lane):
         # TODO: Implement
         self.last_base_waypoints_lane = lane
         self.last_base_waypoints_matrix = waypoints_helper.get_waypoints_matrix(lane.waypoints)
-        
+
+        # if not os.path.exists(path):
+        #     waypoints_helper.save_waypoints(lane.waypoints, path)
+
     def traffic_cb(self, msg):
+
         # TODO: Callback for /traffic_waypoint message. Implement
         self.upcoming_traffic_light_position = msg
         self.upcoming_traffic_light_message_time = rospy.get_rostime()
 
     def is_traffic_light_message_stale(self):
-        
+
         ros_duration = rospy.get_rostime() - self.upcoming_traffic_light_message_time
         duration_in_seconds = ros_duration.secs + (1e-9 * ros_duration.nsecs)
-        
         return duration_in_seconds > 0.25
-    
+
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
         pass
@@ -179,13 +192,13 @@ class WaypointUpdater(object):
 
     def distance(self, waypoints, wp1, wp2):
         dist = 0
-        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 + (a.z-b.z)**2)
         for i in range(wp1, wp2+1):
             dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
 
-    def velocity_cb(self,message):
+    def velocity_cb(self, message):
         self.current_linear_velocity = message.twist.linear.x
 
     def print_car_waypoint(self, car_waypoint_index):
@@ -203,8 +216,8 @@ class WaypointUpdater(object):
         if duration_since_debug_in_seconds > 0.5:
             rospy.logwarn("Current waypoint: {}".format(car_waypoint_index))
             self.previous_debug_time = current_time
-            
-            
+
+
 if __name__ == '__main__':
     try:
         WaypointUpdater()

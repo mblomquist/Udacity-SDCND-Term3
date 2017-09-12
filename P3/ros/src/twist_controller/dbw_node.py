@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 
+import math
+
 import rospy
 from std_msgs.msg import Bool
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
-import math
+import geometry_msgs.msg
+import styx_msgs.msg
+import std_msgs.msg
 
 from twist_controller import Controller
+import dbw_helper
+import pid
+
 
 '''
 You can build this node only after you have built (or partially built) the `waypoint_updater` node.
@@ -31,7 +38,9 @@ that we have created in the `__init__` function.
 
 '''
 
+
 class DBWNode(object):
+
     def __init__(self):
         rospy.init_node('dbw_node')
 
@@ -46,6 +55,18 @@ class DBWNode(object):
         max_lat_accel = rospy.get_param('~max_lat_accel', 3.)
         max_steer_angle = rospy.get_param('~max_steer_angle', 8.)
 
+        self.is_drive_by_wire_enable = False
+        self.last_twist_command = None
+        self.current_velocity = None
+        self.current_pose = None
+        self.final_waypoints = None
+        self.previous_loop_time = rospy.get_rostime()
+        self.previous_debug_time = rospy.get_rostime()
+
+        self.throttle_pid = pid.PID(kp=0.2, ki=0.005, kd=0.1, mn=decel_limit, mx=0.5 * accel_limit)
+        self.brake_pid = pid.PID(kp=100.0, ki=0.001, kd=0.1, mn=brake_deadband, mx=2000)
+        self.steering_pid = pid.PID(kp=1.0, ki=0.001, kd=0.5, mn=-max_steer_angle, mx=max_steer_angle)
+
         self.steer_pub = rospy.Publisher('/vehicle/steering_cmd',
                                          SteeringCmd, queue_size=1)
         self.throttle_pub = rospy.Publisher('/vehicle/throttle_cmd',
@@ -54,15 +75,19 @@ class DBWNode(object):
                                          BrakeCmd, queue_size=1)
 
         # TODO: Create `TwistController` object
-        # self.controller = TwistController(<Arguments you wish to provide>)
+        self.controller = Controller(self.throttle_pid, self.brake_pid, self.steering_pid)
 
         # TODO: Subscribe to all the topics you need to
-        rospy.Subscriber('/twist_cmd', ???, self.twist_cmd)
-        
+        rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_commands_cb, queue_size=1)
+        rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.drive_by_wire_enabled_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb, queue_size=1)
+        rospy.Subscriber('/current_pose', geometry_msgs.msg.PoseStamped, self.current_pose_cb, queue_size=1)
+        rospy.Subscriber('/final_waypoints', styx_msgs.msg.Lane, self.final_waypoints_cb, queue_size=1)
+
         self.loop()
 
     def loop(self):
-        rate = rospy.Rate(50) # 50Hz
+        rate = rospy.Rate(10)  # Frequency
         while not rospy.is_shutdown():
             # TODO: Get predicted throttle, brake, and steering using `twist_controller`
             # You should only publish the control commands if dbw is enabled
@@ -71,8 +96,28 @@ class DBWNode(object):
             #                                                     <current linear velocity>,
             #                                                     <dbw status>,
             #                                                     <any other argument you need>)
-            # if <dbw is enabled>:
-            #   self.publish(throttle, brake, steer)
+
+            data = [self.last_twist_command, self.current_velocity, self.current_pose, self.final_waypoints]
+            is_all_data_availabe = all([x is not None for x in data])
+
+            if self.is_drive_by_wire_enable and is_all_data_availabe:
+
+                current_time = rospy.get_rostime()
+                ros_duration = current_time - self.previous_loop_time
+                duration_in_seconds = ros_duration.secs + (1e-9 * ros_duration.nsecs)
+                self.previous_loop_time = current_time
+
+                # Base linear velocity error on difference between current speed and desired speed x waypoints later
+                linear_velocity_error = self.final_waypoints[1].twist.twist.linear.x - self.current_velocity.linear.x
+                cross_track_error = dbw_helper.get_cross_track_error(self.final_waypoints, self.current_pose)
+
+                # Primitive command
+                throttle, brake, steering = self.controller.control(
+                    linear_velocity_error, cross_track_error, duration_in_seconds)
+
+                self.publish(throttle, brake, steering)
+                # self.print_debug_info(throttle, brake, steering, linear_velocity_error)
+
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
@@ -92,6 +137,46 @@ class DBWNode(object):
         bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
         bcmd.pedal_cmd = brake
         self.brake_pub.publish(bcmd)
+
+    def twist_commands_cb(self, msg):
+
+        self.last_twist_command = msg.twist
+
+    def drive_by_wire_enabled_cb(self, msg):
+
+        self.is_drive_by_wire_enable = bool(msg.data)
+
+        if self.is_drive_by_wire_enable is True:
+
+            self.throttle_pid.reset()
+            self.brake_pid.reset()
+            self.steering_pid.reset()
+
+    def current_velocity_cb(self, msg):
+        self.current_velocity = msg.twist
+
+    def current_pose_cb(self, msg):
+        self.current_pose = msg.pose
+
+    def final_waypoints_cb(self, msg):
+        self.final_waypoints = msg.waypoints
+
+    def print_debug_info(self, throttle, brake, steering, linear_velocity_error):
+        """
+        Print debugging commands. Only prints out if enough time has passed since last printout
+        """
+
+        current_time = rospy.get_rostime()
+        ros_duration_since_debug = current_time - self.previous_debug_time
+        duration_since_debug_in_seconds = ros_duration_since_debug.secs + (1e-9 * ros_duration_since_debug.nsecs)
+
+        if duration_since_debug_in_seconds > 0.5:
+
+            rospy.logwarn("linear_velocity_error: {}".format(linear_velocity_error))
+            rospy.logwarn("Throttle command: {}".format(throttle))
+            rospy.logwarn("Brake command: {}".format(brake))
+
+            self.previous_debug_time = current_time
 
 
 if __name__ == '__main__':
