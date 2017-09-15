@@ -1,8 +1,8 @@
-prefix=/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/install
+prefix=/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/install
 
 Name: tl_detector
 Description: Description of tl_detector
 Version: 0.0.0
 Cflags: 
-Libs: -L/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/install/lib 
+Libs: -L/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/install/lib 
 Requires: 

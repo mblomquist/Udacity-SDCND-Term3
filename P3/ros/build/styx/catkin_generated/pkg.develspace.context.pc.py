@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "styx"
-PROJECT_SPACE_DIR = "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel"
+PROJECT_SPACE_DIR = "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel"
 PROJECT_VERSION = "0.0.0"

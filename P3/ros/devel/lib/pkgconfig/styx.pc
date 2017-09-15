@@ -1,8 +1,8 @@
-prefix=/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel
+prefix=/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel
 
 Name: styx
 Description: Description of styx
 Version: 0.0.0
 Cflags: 
-Libs: -L/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/lib 
+Libs: -L/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/lib 
 Requires: 

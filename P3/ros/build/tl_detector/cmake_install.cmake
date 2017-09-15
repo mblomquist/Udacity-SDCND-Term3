@@ -1,8 +1,8 @@
-# Install script for directory: /home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/tl_detector
+# Install script for directory: /home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/src/tl_detector
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/install")
+  set(CMAKE_INSTALL_PREFIX "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,17 +33,17 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/tl_detector/catkin_generated/installspace/tl_detector.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/tl_detector/catkin_generated/installspace/tl_detector.pc")
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/tl_detector/cmake" TYPE FILE FILES
-    "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/tl_detector/catkin_generated/installspace/tl_detectorConfig.cmake"
-    "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/tl_detector/catkin_generated/installspace/tl_detectorConfig-version.cmake"
+    "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/tl_detector/catkin_generated/installspace/tl_detectorConfig.cmake"
+    "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/tl_detector/catkin_generated/installspace/tl_detectorConfig-version.cmake"
     )
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/tl_detector" TYPE FILE FILES "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/tl_detector/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/tl_detector" TYPE FILE FILES "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/src/tl_detector/package.xml")
 endif()
 

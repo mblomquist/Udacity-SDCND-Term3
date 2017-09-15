@@ -1,9 +1,9 @@
 file(REMOVE_RECURSE
   "CMakeFiles/styx_msgs_generate_messages_lisp"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/share/common-lisp/ros/styx_msgs/msg/Waypoint.lisp"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/share/common-lisp/ros/styx_msgs/msg/TrafficLightArray.lisp"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/share/common-lisp/ros/styx_msgs/msg/TrafficLight.lisp"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/share/common-lisp/ros/styx_msgs/msg/Lane.lisp"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/share/common-lisp/ros/styx_msgs/msg/TrafficLight.lisp"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/share/common-lisp/ros/styx_msgs/msg/Waypoint.lisp"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/share/common-lisp/ros/styx_msgs/msg/Lane.lisp"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/share/common-lisp/ros/styx_msgs/msg/TrafficLightArray.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

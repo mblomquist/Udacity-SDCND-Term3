@@ -1,8 +1,8 @@
-# Install script for directory: /home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/twist_controller
+# Install script for directory: /home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/src/twist_controller
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/install")
+  set(CMAKE_INSTALL_PREFIX "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,17 +33,17 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/twist_controller/catkin_generated/installspace/twist_controller.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/twist_controller/catkin_generated/installspace/twist_controller.pc")
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/twist_controller/cmake" TYPE FILE FILES
-    "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/twist_controller/catkin_generated/installspace/twist_controllerConfig.cmake"
-    "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/twist_controller/catkin_generated/installspace/twist_controllerConfig-version.cmake"
+    "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/twist_controller/catkin_generated/installspace/twist_controllerConfig.cmake"
+    "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/twist_controller/catkin_generated/installspace/twist_controllerConfig-version.cmake"
     )
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/twist_controller" TYPE FILE FILES "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src/twist_controller/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/twist_controller" TYPE FILE FILES "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/src/twist_controller/package.xml")
 endif()
 

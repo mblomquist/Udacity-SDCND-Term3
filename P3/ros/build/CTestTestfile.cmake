@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
-# Source directory: /home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/src
-# Build directory: /home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build
+# Source directory: /home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/src
+# Build directory: /home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.

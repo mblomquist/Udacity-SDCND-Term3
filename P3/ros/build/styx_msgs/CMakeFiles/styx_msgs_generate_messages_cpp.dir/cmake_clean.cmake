@@ -1,9 +1,9 @@
 file(REMOVE_RECURSE
   "CMakeFiles/styx_msgs_generate_messages_cpp"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/include/styx_msgs/Waypoint.h"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/include/styx_msgs/TrafficLightArray.h"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/include/styx_msgs/TrafficLight.h"
-  "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/include/styx_msgs/Lane.h"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/include/styx_msgs/TrafficLight.h"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/include/styx_msgs/Waypoint.h"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/include/styx_msgs/Lane.h"
+  "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/include/styx_msgs/TrafficLightArray.h"
 )
 
 # Per-language clean rules from dependency scanning.

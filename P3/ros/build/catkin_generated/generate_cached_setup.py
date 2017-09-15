@@ -19,9 +19,9 @@ except ImportError:
             break
     from catkin.environment_cache import generate_environment_script
 
-code = generate_environment_script('/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/devel/env.sh')
+code = generate_environment_script('/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/devel/env.sh')
 
-output_filename = '/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build/catkin_generated/setup_cached.sh'
+output_filename = '/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build/catkin_generated/setup_cached.sh'
 with open(output_filename, 'w') as f:
     #print('Generate script for cached setup "%s"' % output_filename)
     f.write('\n'.join(code))

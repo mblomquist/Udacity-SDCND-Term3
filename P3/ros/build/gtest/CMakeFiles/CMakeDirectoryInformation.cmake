@@ -3,7 +3,7 @@
 
 # Relative path conversion top directories.
 set(CMAKE_RELATIVE_PATH_TOP_SOURCE "/usr/src/gtest")
-set(CMAKE_RELATIVE_PATH_TOP_BINARY "/home/matt/Documents/nanodegree/Udacity-SDCND-Term3/P3/ros/build")
+set(CMAKE_RELATIVE_PATH_TOP_BINARY "/home/matt/Documents/nanodegree/Group-CarND-Capstone/CarND-Capstone/ros/build")
 
 # Force unix paths in dependencies.
 set(CMAKE_FORCE_UNIX_PATHS 1)
